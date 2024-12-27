@@ -29,4 +29,9 @@ func main() {
 	parallelSearch(&tree, search)
 	elapsed = time.Since(start)
 	fmt.Printf("Concurrent: %s\n", elapsed)
+
+	start = time.Now()
+	lazyThread(&tree, search)
+	elapsed = time.Since(start)
+	fmt.Printf("Lazy: %s\n", elapsed)
 }
