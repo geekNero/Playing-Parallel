@@ -25,10 +25,10 @@ func main() {
 	elapsed := time.Since(start)
 	fmt.Printf("Linear: %s\n", elapsed)
 
-	start = time.Now()
-	parallelSearch(&tree, search)
-	elapsed = time.Since(start)
-	fmt.Printf("Concurrent: %s\n", elapsed)
+	// start = time.Now()
+	// parallelSearch(&tree, search)
+	// elapsed = time.Since(start)
+	// fmt.Printf("Concurrent: %s\n", elapsed)
 
 	start = time.Now()
 	lazyThread(&tree, search)

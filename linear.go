@@ -14,6 +14,7 @@ func BFS(tree *map[int][]int, node int, find int) bool {
 		cur := current.Value.(int)
 		queue.Remove(current)
 		for _, v := range (*tree)[cur] {
+			// time.Sleep(500 * time.Millisecond)
 			if v == find {
 				return true
 			}

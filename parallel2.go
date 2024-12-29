@@ -3,58 +3,55 @@ package main
 import (
 	"container/list"
 	"fmt"
+	"sync/atomic"
 )
-
-func ifResultFound(c chan bool) int {
-	select {
-	case val := <-c:
-		if val {
-			return 1
-		} else {
-			return 0
-		}
-	default:
-		return -1
-	}
-}
 
 func masterBFS(tree *map[int][]int, queue *list.List, find int) bool {
 	ch := make(chan bool, 1)
-	ch <- false
+	slave_queue := list.New()
+	thread_free := int32(0)
 	for queue.Len() > 0 {
 		current := queue.Front()
 		queue.Remove(current)
 		cur := current.Value.(int)
-		if ifResultFound(ch) == 0 {
-			go slaveBFS(tree, cur, find, ch)
+		slave_status := atomic.LoadInt32(&thread_free)
+		if slave_status == 0 && len((*tree)[cur]) > 20 {
+			slave_queue.PushBack(cur)
+			atomic.StoreInt32(&thread_free, -1)
+			go slaveBFS(tree, slave_queue, find, ch, &thread_free)
 			continue
-		} else if ifResultFound(ch) == 1 {
+		} else if slave_status == 1 {
 			return true
 		}
 		for _, v := range (*tree)[cur] {
+			// time.Sleep(500 * time.Millisecond)
 			if v == find {
 				return true
 			}
 			queue.PushBack(v)
 		}
 	}
+	if atomic.LoadInt32(&thread_free) == 0 {
+		return false
+	}
 	return <-ch
 }
-func slaveBFS(tree *map[int][]int, node int, find int, in chan bool) {
-	queue := list.New()
-	queue.PushBack(node)
+func slaveBFS(tree *map[int][]int, queue *list.List, find int, in chan bool, out *int32) {
 	for queue.Len() > 0 {
 		current := queue.Front()
 		queue.Remove(current)
 		cur := current.Value.(int)
 		for _, v := range (*tree)[cur] {
+			// time.Sleep(500 * time.Millisecond)
 			if v == find {
+				atomic.StoreInt32(out, 1)
 				in <- true
 				return
 			}
 			queue.PushBack(v)
 		}
 	}
+	atomic.StoreInt32(out, 0)
 	in <- false
 }
 

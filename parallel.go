@@ -23,6 +23,8 @@ type Queue struct {
 func (q *Queue) SplitHalf(q1 *Queue) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
+	q1.mu.Lock()
+	defer q1.mu.Unlock()
 	for i := 0; i < q.value.Len(); i += 2 {
 		q1.PushBack(q.value.Front().Value.(int))
 		q.value.Remove(q.value.Front())
@@ -30,14 +32,14 @@ func (q *Queue) SplitHalf(q1 *Queue) {
 }
 
 func (q *Queue) Len() int {
-	q.mu.Lock()
-	defer q.mu.Unlock()
+	// q.mu.Lock()
+	// defer q.mu.Unlock()
 	return q.value.Len()
 }
 
 func (q *Queue) Remove(val *list.Element) {
-	q.mu.Lock()
-	defer q.mu.Unlock()
+	// q.mu.Lock()
+	// defer q.mu.Unlock()
 	q.value.Remove(val)
 }
 
@@ -48,14 +50,14 @@ func NewQueue() *Queue {
 }
 
 func (q *Queue) PushBack(val int) {
-	q.mu.Lock()
-	defer q.mu.Unlock()
+	// q.mu.Lock()
+	// defer q.mu.Unlock()
 	q.value.PushBack(val)
 }
 
 func (q *Queue) Front() *list.Element {
-	q.mu.Lock()
-	defer q.mu.Unlock()
+	// q.mu.Lock()
+	// defer q.mu.Unlock()
 	return q.value.Front()
 }
 
@@ -85,6 +87,7 @@ func BFSParallel(tree *map[int][]int, node int, find int, in chan int) int {
 		cur := current.Value.(int)
 		queue.Remove(current)
 		for _, v := range (*tree)[cur] {
+			// time.Sleep(500 * time.Millisecond)
 			if v == find {
 				return 1
 			}
